@@ -10,11 +10,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import androidx.appcompat.widget.SearchView;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    ListView lv;
+    SearchView searchView;
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
             apellidos.add(cursor.getString(1));
         }
 
-        ListView lv = (ListView) findViewById(R.id.lista);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, contactos);
+        searchView = findViewById(R.id.search_bar);
+        lv = findViewById(R.id.lista);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, contactos);
         lv.setAdapter(adapter);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -53,6 +59,19 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ContactoActivity.class);
                 intent.putExtra("apellido",apellidos.get(position));
                 startActivity(intent);
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
             }
         });
     }
