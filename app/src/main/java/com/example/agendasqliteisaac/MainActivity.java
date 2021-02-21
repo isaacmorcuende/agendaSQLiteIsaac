@@ -70,7 +70,33 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
+                apellidos.clear();
+                contactos.clear();
+                Cursor c = null;
+
+                /*si hay texto en el searchbar apareceran los contactos que tengan ese texto en el nombre, apellidos o numero,
+                si no hay nada o lo borra volvemos a mostrar todos los contactos*/
+                if(newText != null && newText.length()>0){
+                    String sql="SELECT * FROM contactos WHERE apellido LIKE '%"+newText+"%' OR nombre LIKE '%"+newText+"%'" +
+                            "OR telefono LIKE '%"+newText+"%'";
+                    c=db.rawQuery(sql,null);
+                }else{
+                    String query1 = "SELECT * FROM contactos";
+                    c = db.rawQuery(query1,null);
+                }
+
+                while(c.moveToNext()){
+                    //para que aparezca en el listview
+                    String contacto = c.getString(0) + " " + c.getString(1) +
+                            "\n"+c.getString(2);
+                    contactos.add(contacto);
+
+                    //para poder pasar el contacto a otra activity
+                    apellidos.add(c.getString(1));
+                }
+
+                adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, contactos);
+                lv.setAdapter(adapter);
                 return false;
             }
         });
