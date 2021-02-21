@@ -16,7 +16,7 @@ import android.widget.Toast;
 import java.io.File;
 
 public class ModificarActivity extends AppCompatActivity {
-    private String ap;
+    private String idCont;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,18 +28,18 @@ public class ModificarActivity extends AppCompatActivity {
         EditText telefono = (EditText)findViewById(R.id.mod_telefono);
         EditText edad = (EditText)findViewById(R.id.mod_edad);
 
-        File f = getDatabasePath("agenda.sqlite");
+        File f = getDatabasePath("agenda1.sqlite");
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
-        String ape = getIntent().getExtras().getString("apellido",null);
+        String id = getIntent().getExtras().getString("id",null);
 
-        String query = "SELECT * FROM contactos WHERE apellido='"+ape+"'";
+        String query = "SELECT * FROM contactos WHERE id="+id;
         Cursor cursor = db.rawQuery(query,null);
         if(cursor.moveToNext()){
-            nombre.setText(cursor.getString(0));
-            apellido.setText(cursor.getString(1));
-            ap = cursor.getString(1);
-            telefono.setText(cursor.getString(2));
-            edad.setText(cursor.getString(3));
+            idCont = cursor.getString(0);
+            nombre.setText(cursor.getString(1));
+            apellido.setText(cursor.getString(2));
+            telefono.setText(cursor.getString(3));
+            edad.setText(cursor.getString(4));
         }
 
     }
@@ -52,9 +52,9 @@ public class ModificarActivity extends AppCompatActivity {
         EditText edad = (EditText)findViewById(R.id.mod_edad);
 
         if(nombre.getText().length()>0 && apellido.getText().length()>0 && telefono.getText().length()>0 && edad.getText().length()>0){
-            File f = getDatabasePath("agenda.sqlite");
+            File f = getDatabasePath("agenda1.sqlite");
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
-            String consulta = "SELECT * FROM contactos WHERE apellido='"+apellido.getText()+"'";
+            String consulta = "SELECT * FROM contactos WHERE id="+idCont;
             Cursor cursor = db.rawQuery(consulta, null);
 
             if(cursor.moveToNext()){
@@ -66,14 +66,15 @@ public class ModificarActivity extends AppCompatActivity {
                     public void onClick(DialogInterface arg0, int arg1) {
                         ContentValues contactoMod = new ContentValues();
                         contactoMod.put("nombre",nombre.getText().toString());
+                        contactoMod.put("apellido",apellido.getText().toString());
                         contactoMod.put("telefono",telefono.getText().toString());
                         contactoMod.put("edad",edad.getText().toString());
 
-                        db.update("contactos",contactoMod,"apellido='"+apellido.getText()+"'",null);
+                        db.update("contactos",contactoMod,"id="+idCont,null);
                         Toast.makeText(ModificarActivity.this, "¡Contacto modificado!", Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(ModificarActivity.this, ContactoActivity.class);
-                        intent.putExtra("apellido",ap);
+                        intent.putExtra("id",idCont);
                         startActivity(intent);
                     }
                 });
@@ -98,7 +99,7 @@ public class ModificarActivity extends AppCompatActivity {
 
     public void volver(View v){
         Intent intent = new Intent(this, ContactoActivity.class);
-        intent.putExtra("apellido",ap);
+        intent.putExtra("id",idCont);
         startActivity(intent);
     }
 }

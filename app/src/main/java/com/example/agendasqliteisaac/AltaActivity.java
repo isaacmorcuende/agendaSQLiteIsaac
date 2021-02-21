@@ -26,10 +26,10 @@ public class AltaActivity extends AppCompatActivity {
         EditText edad = (EditText)findViewById(R.id.et_edad);
 
         if(nombre.getText().length()>0 && apellido.getText().length()>0 && telefono.getText().length()>0 && edad.getText().length()>0){
-            File f = getDatabasePath("agenda.sqlite");
+            File f = getDatabasePath("agenda1.sqlite");
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
 
-            String query = "INSERT INTO contactos VALUES('"+nombre.getText()+"','"+apellido.getText()+"','"+ telefono.getText()+"',"+edad.getText()+ ")";
+            String query = "INSERT INTO contactos(nombre,apellido,telefono,edad) VALUES('"+nombre.getText()+"','"+apellido.getText()+"','"+ telefono.getText()+"',"+edad.getText()+ ")";
 
             db.execSQL(query);
             Toast.makeText(this, "¡Contacto añadido!", Toast.LENGTH_SHORT).show();

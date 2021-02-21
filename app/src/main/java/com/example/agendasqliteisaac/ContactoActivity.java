@@ -20,7 +20,7 @@ import android.widget.Toast;
 import java.io.File;
 
 public class ContactoActivity extends AppCompatActivity {
-    private String ap;
+    private String idCont;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +32,19 @@ public class ContactoActivity extends AppCompatActivity {
         TextView telefono = (TextView)findViewById(R.id.telefono_contacto);
         TextView edad = (TextView)findViewById(R.id.edad_contacto);
 
-        File f = getDatabasePath("agenda.sqlite");
+        File f = getDatabasePath("agenda1.sqlite");
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
 
-        String ape = getIntent().getExtras().getString("apellido",null);
+        String id = getIntent().getExtras().getString("id",null);
 
-        String query = "SELECT * FROM contactos WHERE apellido='"+ape+"'";
+        String query = "SELECT * FROM contactos WHERE id="+id;
         Cursor cursor = db.rawQuery(query,null);
         if(cursor.moveToNext()){
-            nombre.setText(cursor.getString(0));
-            apellido.setText(cursor.getString(1));
-            ap = cursor.getString(1);
-            telefono.setText(cursor.getString(2));
-            edad.setText(cursor.getString(3));
+            idCont = cursor.getString(0);
+            nombre.setText(cursor.getString(1));
+            apellido.setText(cursor.getString(2));
+            telefono.setText(cursor.getString(3));
+            edad.setText(cursor.getString(4));
         }
     }
 
@@ -59,7 +59,7 @@ public class ContactoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.delete_item:
-                File f = getDatabasePath("agenda.sqlite");
+                File f = getDatabasePath("agenda1.sqlite");
                 SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
 
                 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
@@ -68,7 +68,7 @@ public class ContactoActivity extends AppCompatActivity {
                 alertbox.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     //Funcion llamada cuando se pulsa el boton Si
                     public void onClick(DialogInterface arg0, int arg1) {
-                        String query = "DELETE FROM contactos WHERE apellido='"+ap+"'";
+                        String query = "DELETE FROM contactos WHERE id="+idCont;
                         db.execSQL(query);
                         Toast.makeText(ContactoActivity.this, "¡Contacto eliminado!", Toast.LENGTH_SHORT).show();
 
@@ -89,7 +89,7 @@ public class ContactoActivity extends AppCompatActivity {
                 return true;
             case R.id.edit_item:
                 Intent intent = new Intent(this, ModificarActivity.class);
-                intent.putExtra("apellido",ap);
+                intent.putExtra("id",idCont);
                 startActivity(intent);
                 return true;
             default:

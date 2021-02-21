@@ -26,26 +26,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        File f = getDatabasePath("agenda.sqlite");
+        File f = getDatabasePath("agenda1.sqlite");
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(f.getPath(), null);
 
-        String query = "create table if not exists contactos(nombre text, apellido text primary key, telefono text, edad integer)";
+        String query = "create table if not exists contactos(id integer primary key autoincrement, nombre text, apellido text, " +
+                "telefono text, edad integer)";
 
         db.execSQL(query);
-
-        String query1 = "SELECT * FROM contactos";
+        String query1 = "SELECT id,nombre,apellido,telefono FROM contactos";
         Cursor cursor = db.rawQuery(query1,null);
-        ArrayList<String> apellidos = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
         ArrayList<String> contactos = new ArrayList<>();
 
         while(cursor.moveToNext()){
             //para que aparezca en el listview
-            String contacto = cursor.getString(0) + " " + cursor.getString(1) +
-                    "\n"+cursor.getString(2);
+            String contacto = cursor.getString(1) + " " + cursor.getString(2) +
+                    "\n"+cursor.getString(3);
             contactos.add(contacto);
 
             //para poder pasar el contacto a otra activity
-            apellidos.add(cursor.getString(1));
+            ids.add(cursor.getString(0));
         }
 
         searchView = findViewById(R.id.search_bar);
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ContactoActivity.class);
-                intent.putExtra("apellido",apellidos.get(position));
+                intent.putExtra("id",ids.get(position));
                 startActivity(intent);
             }
         });
@@ -70,29 +70,29 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                apellidos.clear();
+                ids.clear();
                 contactos.clear();
                 Cursor c = null;
 
                 /*si hay texto en el searchbar apareceran los contactos que tengan ese texto en el nombre, apellidos o numero,
                 si no hay nada o lo borra volvemos a mostrar todos los contactos*/
                 if(newText != null && newText.length()>0){
-                    String sql="SELECT * FROM contactos WHERE apellido LIKE '%"+newText+"%' OR nombre LIKE '%"+newText+"%'" +
+                    String sql="SELECT id,nombre,apellido,telefono FROM contactos WHERE apellido LIKE '%"+newText+"%' OR nombre LIKE '%"+newText+"%'" +
                             "OR telefono LIKE '%"+newText+"%'";
                     c=db.rawQuery(sql,null);
                 }else{
-                    String query1 = "SELECT * FROM contactos";
+                    String query1 = "SELECT id,nombre,apellido,telefono FROM contactos";
                     c = db.rawQuery(query1,null);
                 }
 
                 while(c.moveToNext()){
                     //para que aparezca en el listview
-                    String contacto = c.getString(0) + " " + c.getString(1) +
-                            "\n"+c.getString(2);
+                    String contacto = c.getString(1) + " " + c.getString(2) +
+                            "\n"+c.getString(3);
                     contactos.add(contacto);
 
                     //para poder pasar el contacto a otra activity
-                    apellidos.add(c.getString(1));
+                    ids.add(c.getString(0));
                 }
 
                 adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, contactos);
